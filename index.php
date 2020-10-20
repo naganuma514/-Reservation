@@ -1,14 +1,9 @@
 <?php
 // タイムゾーンを設定
 date_default_timezone_set('Asia/Tokyo');
-
+require 'reservation_class.php';
 // 前月・次月リンクが押された場合は、GETパラメーターから年月を取得
-if (isset($_GET['ym'])) {
-    $ym = $_GET['ym'];
-} else {
-    // 今月の年月を表示
-    $ym = date('Y-m');
-}
+$ym=thisMonth($_GET['ym']);
 
 // タイムスタンプを作成し、フォーマットをチェックする
 $timestamp = strtotime($ym . '-01');
@@ -43,35 +38,7 @@ $week = '';
 // 例）１日が水曜日だった場合、日曜日から火曜日の３つ分の空セルを追加する
 $week .= str_repeat('<td></td>', $youbi);
 
-for ( $day = 1; $day <= $day_count; $day++, $youbi++) {
-
-    // 2017-07-3
-    $date = $ym . '-' . $day;
-
-    if ($today == $date) {
-        // 今日の日付の場合は、class="today"をつける
-        $week .= '<td class="today">' . $day;
-    } else {
-        $week .= '<td>' . $day . "<a href='a.php'>飛ぶ</a>"; 
-    }
-    $week .= '</td>';
-
-    // 週終わり、または、月終わりの場合
-    if ($youbi % 7 == 6 || $day == $day_count) {
-
-        if ($day == $day_count) {
-            // 月の最終日の場合、空セルを追加
-            // 例）最終日が木曜日の場合、金・土曜日の空セルを追加
-            $week .= str_repeat('<td></td>', 6 - ($youbi % 7));
-        }
-
-        // weeks配列にtrと$weekを追加する
-        $weeks[] = '<tr>' . $week . '</tr>';
-
-        // weekをリセット
-        $week = '';
-	}
-}
+$weeks=make($day_count,$youbi,$ym,$today,$week,$weeks);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
